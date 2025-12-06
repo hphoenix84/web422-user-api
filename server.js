@@ -13,7 +13,7 @@ app.use(cors());
 
 // Middleware to verify JWT token
 function verifyToken(req, res, next) {
-  const token = req.headers['authorization']?.split(' ')[1]; // Bearer TOKEN
+  const token = req.headers['authorization']?.split(' ')[1];
   
   if (!token) {
     return res.status(403).json({ message: "No token provided" });
@@ -40,7 +40,6 @@ app.post("/api/user/register", (req, res) => {
 app.post("/api/user/login", (req, res) => {
   userService.checkUser(req.body)
     .then((user) => {
-      // Generate JWT token
       const token = jwt.sign(
         { _id: user._id, userName: user.userName },
         process.env.JWT_SECRET,
@@ -83,14 +82,5 @@ app.delete("/api/user/favourites/:id", verifyToken, (req, res) => {
       res.status(422).json({ error: msg });
     })
 });
-
-userService.connect()
-  .then(() => {
-    app.listen(HTTP_PORT, () => { console.log("API listening on: " + HTTP_PORT) });
-  })
-  .catch((err) => {
-    console.log("unable to start the server: " + err);
-    process.exit();
-  });
 
 module.exports = app;
